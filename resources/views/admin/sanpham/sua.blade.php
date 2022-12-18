@@ -1,0 +1,186 @@
+@extends('admin.layout.index')
+@section('content')
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary" style="text-align:center">Sửa sản phẩm</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            @if(count($errors)>0)
+            <div class="alert alert-danger">
+                @foreach($errors->all() as $err)
+                {{$err}} <br>
+                @endforeach
+            </div>
+            @endif
+            @if(session('thongbao'))
+            <div class="alert alert-success">
+                {{session('thongbao')}}
+            </div>
+            @endif
+            @if(session('thongbaogia'))
+            <div class="alert alert-danger">
+                {{session('thongbaogia')}}
+            </div>
+            @endif
+            @if(session('loi'))
+            <div class="alert alert-danger">
+                {{session('loi')}}
+            </div>
+            @endif
+            <form method="post" action="admin/sanpham/sua/{{$sanpham->sp_id}}" enctype="multipart/form-data">
+                @csrf
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1" class="font-weight-bold">Tên thương hiệu</label>
+                    <select class="form-control" id="exampleFormControlSelect1" name="th_id">
+                        @foreach($thuonghieu as $th)
+
+                        <option value="{{$th->th_id}}" @if($th->th_id==$sanpham->thuonghieu->th_id)
+                            {{"selected"}}
+                            @endif
+                            >{{$th->th_ten}}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="thuonghieu_id" class="font-weight-bold"> Tên sản phẩm</label>
+                    <input type="text" value="{{$sanpham->sp_ten}}" class="form-control" name="sp_ten" placeholder="Nhập tên sản phẩm">
+                </div>
+                <div class="form-group">
+                    <label for="thuonghieu_id" class="font-weight-bold">Số lượng</label>
+                    <input type="text" value="{{$sanpham->sp_soluong}}" class="form-control" name="sp_soluong" placeholder="Nhập số lượng">
+                </div>
+                <div class="form-group">
+                    <label for="thuonghieu_id" class="font-weight-bold">Giá hiện tại</label>
+                    <input type="text" id="gia" value='{{ number_format($sanpham->sp_gia, 0, ".", ",")}}' class="form-control" name="sp_gia" placeholder="Nhập giá">
+                </div>
+                <div class="form-group">
+                    <label for="thuonghieu_id" class="font-weight-bold">Giá cũ</label>
+                    <input type="text" id="gia_cu" value='{{ number_format($sanpham->sp_giacu, 0, ".", ",")}}' class="form-control" name="sp_giacu" placeholder="Nhập giá cũ ('0' là không có giá cũ)">
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold">Hình ảnh hiện tại</label>
+                    <div class="preview-img-container">
+                        <img src="upload/sanpham/{{$sanpham->sp_hinhanh}}" width="200px">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold">Cập nhật hình ảnh</label>
+                    <div class="preview-img-container">
+                        <img id="preview-img" src="admin_asset/img/noimg.png" width="200px">
+                    </div>
+                    <input type="file" class="form-control" id="hinhanh" name="sp_hinhanh">
+                </div>
+                <div class="form-group">
+                    <label for="thuonghieu_id" class="font-weight-bold">Khuyến mãi</label>
+                    <textarea type="text" class="form-control" id="sp_km" name="sp_km" placeholder="Nhập khuyến mãi">{{$sanpham->sp_km}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="thuonghieu_id" class="font-weight-bold">Thông số kỹ thuật</label>
+                    <textarea type="text" class="form-control" id="sp_tskt" name="sp_tskt" placeholder="Nhập bảng thông số kỹ thuật">{{$sanpham->sp_tskt}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="thuonghieu_id" class="font-weight-bold">Mô tả chi tiết</label>
+                    <textarea type="text" class="form-control" id="sp_chitiet" name="sp_chitiet" placeholder="Nhập mô tả chi tiết">{{$sanpham->sp_chitiet}}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" name="btnSave">Sửa</button>
+                <a href="admin/sanpham/danhsach" class="btn btn-secondary" name="comeback">Trở về </a>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary text-center">Bình luận {{$sanpham->sp_ten}}</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Tên khách hàng</th>
+                        <th>Nội dung</th>
+                        <th>Ngày tạo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($sanpham->comment as $bl)
+                    <tr>
+                        <td>{{$bl->bl_id}}</td>
+                        <td>{{$bl->user->user_name}}</td>
+                        <td>{{$bl->bl_noidung}}</td>
+                        <td>
+                            <a href="admin/comment/xoa/{{$bl->bl_id}}/{{$sanpham->sp_id}}" class="btn btn-danger"><i class="fa fa-trash-alt"></i></a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@endsection
+@section('script')
+<script>
+    const reader = new FileReader();
+    const fileInput = document.getElementById("hinhanh");
+    const img = document.getElementById("preview-img");
+    reader.onload = e => {
+        img.src = e.target.result;
+    }
+    fileInput.addEventListener('change', e => {
+        const f = e.target.files[0];
+        reader.readAsDataURL(f);
+    })
+</script>
+<script src="admin_asset/ckeditor/ckeditor.js"> </script>
+<script src="admin_asset/ckfinder/ckfinder.js"> </script>
+<script>
+    var url = 'admin_asset';
+    CKEDITOR.replace('sp_tskt', {
+        extraPlugins: 'editorplaceholder',
+        editorplaceholder: 'Nhập bảng thông tin kỹ thuật...',
+        filebrowserBrowseUrl: url + '/ckfinder/ckfinder.html',
+        filebrowserImageBrowseUrl: url + '/ckfinder/ckfinder.html?type=Images',
+        filebrowserUploadUrl: url + '/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files',
+        filebrowserImageUploadUrl: url + '/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images'
+    });
+    CKEDITOR.replace('sp_chitiet', {
+        extraPlugins: 'editorplaceholder',
+        editorplaceholder: 'Nhập mô tả chi tiết...',
+        filebrowserBrowseUrl: url + '/ckfinder/ckfinder.html',
+        filebrowserImageBrowseUrl: url + '/ckfinder/ckfinder.html?type=Images',
+        filebrowserUploadUrl: url + '/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files',
+        filebrowserImageUploadUrl: url + '/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images'
+    });
+    var url = 'admin_asset';
+    CKEDITOR.replace('sp_km', {
+        extraPlugins: 'editorplaceholder',
+        editorplaceholder: 'Nhập khuyến mãi đặt biệt...',
+        filebrowserBrowseUrl: url + '/ckfinder/ckfinder.html',
+        filebrowserImageBrowseUrl: url + '/ckfinder/ckfinder.html?type=Images',
+        filebrowserUploadUrl: url + '/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files',
+        filebrowserImageUploadUrl: url + '/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images'
+    });
+</script>
+<script>
+    $('#gia').keyup(function(event) {
+        $(this).val(function(index, value) {
+            return '' + value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        });
+
+    });
+</script>
+<script>
+    $('#gia_cu').keyup(function(event) {
+        $(this).val(function(index, value) {
+            return '' + value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        });
+
+    });
+</script>
+@endsection
